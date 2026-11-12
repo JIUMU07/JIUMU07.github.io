@@ -1,6 +1,6 @@
-# JIUMU07
+# 今天也要好好吃饭
 
-JIUMU 的个人博客，基于 [Hugo](https://gohugo.io/) + [极简 jijian](https://github.com/hcllmsx/hugo-jijian) 主题。
+就暮的个人博客，线上地址 https://jiumu07.github.io/ ，基于 [Hugo](https://gohugo.io/) + [极简 jijian](https://github.com/hcllmsx/hugo-jijian) 主题。
 
 ## 环境要求
 
@@ -101,6 +101,32 @@ hugo.yaml            站点配置
 
 ## 部署
 
-目前 `baseURL` 是 `http://localhost:1313/`，只用于本地预览。要上线时改成真实域名（如 `https://example.com/`），再执行 `npm run build && npm run search`，把 `public/` 目录发布到任意静态托管即可。
+线上地址：**https://jiumu07.github.io/**
+仓库：`JIUMU07/JIUMU07.github.io`（用户站点，根路径，无子目录）
 
-如果部署在子路径（如 GitHub Pages 的 `https://用户名.github.io/仓库名/`），需把 `baseURL` 写成带结尾斜杠的完整子路径。
+### 自动部署
+
+推送到 `main` 即自动构建发布，流程在 `.github/workflows/deploy.yml`：
+
+1. checkout（含主题 submodule）→ 装 Hugo 0.169.0 extended → 装 Node 20
+2. `npm ci` → `hugo --gc --minify --baseURL <Pages 地址>` → `npm run search`
+3. 上传 `public/` 并用 `actions/deploy-pages` 发布
+
+Pages 的发布源是 **GitHub Actions**（不是 branch）。改动发布方式需在仓库 Settings → Pages 里切换。
+
+### 历史版本
+
+2025 年 7 月那版 Hexo 站点（标题「今天也要好好吃饭」，Hexo 7.3.0）完整保留在 `legacy-hexo` 分支，需要时：
+
+```bash
+git fetch origin legacy-hexo
+git checkout legacy-hexo
+```
+
+### 网络前提（本机）
+
+`github.com` 直连会超时，必须走本机 Clash 代理 `127.0.0.1:7890`：
+
+- 本仓库已设 `git config http.proxy http://127.0.0.1:7890`
+- `gh` 命令需临时加环境变量，例如登录：`$env:HTTPS_PROXY="http://127.0.0.1:7890"` 后再执行
+- 关掉 Clash 后推送会报 `Failed to connect to 127.0.0.1 port 7890`，重新开代理即可；不想走代理就 `git config --unset http.proxy`（但直连大概率失败）
