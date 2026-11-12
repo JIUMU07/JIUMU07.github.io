@@ -1,0 +1,127 @@
+baseURL: https://jiumu07.github.io/
+title: 今天也要好好吃饭
+locale: zh-cn
+defaultContentLanguage: zh-cn
+hasCJKLanguage: true
+timeZone: Asia/Shanghai
+theme: jijian
+
+enableRobotsTXT: true
+summaryLength: 70
+
+copyright: 就暮
+
+# Hugo 0.128+ 的分页配置（旧的 paginate 键已废弃）
+pagination:
+  pagerSize: 10
+
+taxonomies:
+  category: categories
+  tag: tags
+
+# PWA manifest（主题 layouts/index.manifest.json 需要此输出格式）
+# Hugo 内置 manifest+json 的后缀是 webmanifest，这里改成 json 以匹配主题模板
+mediaTypes:
+  application/manifest+json:
+    suffixes: ["json"]
+
+outputFormats:
+  manifest:
+    mediaType: application/manifest+json
+    baseName: manifest
+    isPlainText: true
+    rel: manifest
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - manifest
+
+markup:
+  goldmark:
+    renderer:
+      # 允许在 Markdown 中直接写 HTML
+      unsafe: true
+  highlight:
+    noClasses: false
+    guessSyntax: true
+    lineNos: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 3
+    ordered: false
+
+menus:
+  main:
+    - identifier: posts
+      name: 文章
+      url: /posts/
+      weight: 10
+    - identifier: archives
+      name: 时光轴
+      url: /archives/
+      weight: 20
+    - identifier: categories
+      name: 分类
+      url: /categories/
+      weight: 30
+    - identifier: tags
+      name: 标签
+      url: /tags/
+      weight: 40
+    - identifier: search
+      name: 搜索
+      url: /search/
+      weight: 50
+    - identifier: about
+      name: 关于
+      url: /about/
+      weight: 60
+
+params:
+  env: production
+  title: 今天也要好好吃饭
+  description: 就暮的个人博客 —— 记录、思考与折腾。
+  author: 就暮
+  keywords: ["就暮", "JIUMU07", "今天也要好好吃饭", "博客"]
+
+  # 日期格式（Go 时间模板，2006-01-02 即 YYYY-MM-DD）
+  DateFormat: "2006-01-02"
+  defaultTheme: auto
+  disableThemeToggle: false
+
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowFullTextinRSS: true
+  ShowLastMod: true
+
+  # 首页文章列表取哪个 section
+  mainSections: ["posts"]
+
+  # Pagefind 搜索：modal（放大镜+Ctrl+K）/ searchbox（内嵌搜索框）/ off
+  pagefind:
+    searchUI: modal
+
+  # 页头左上角的短名（站点全名太长会挤掉导航）
+  label:
+    text: 就暮
+
+  assets:
+    favicon: /favicon.svg
+    favicon16x16: /favicon-16x16.png
+    favicon32x32: /favicon-32x32.png
+    apple_touch_icon: /apple-touch-icon.png
+    safari_pinned_tab: /safari-pinned-tab.svg
+    manifest_icon_192: /icon-192.png
+    manifest_icon_512: /icon-512.png
+
+  # 页脚：主题已自动输出「© 年份 站点名 · Powered by Hugo & jijian」
+  # 如需补充说明可用 footer.text，会和上面内容以 · 拼接
+  footer:
+    hideCopyright: false
