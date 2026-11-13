@@ -133,10 +133,26 @@ git fetch origin legacy-hexo
 git checkout legacy-hexo
 ```
 
-### 网络前提（本机）
+### 网络前提（校园网 / 无代理）
 
-`github.com` 直连会超时，必须走本机 Clash 代理 `127.0.0.1:7890`：
+这台机器在校园网下，`github.com` 的 DNS 被解析到 `20.6.7.17`，该 IP 被拦，直连必然超时；同时没有可用的本地代理（Clash Verge 装了但不在校园网里开）。
 
-- 本仓库已设 `git config http.proxy http://127.0.0.1:7890`
-- `gh` 命令需临时加环境变量，例如登录：`$env:HTTPS_PROXY="http://127.0.0.1:7890"` 后再执行
-- 关掉 Clash 后推送会报 `Failed to connect to 127.0.0.1 port 7890`，重新开代理即可；不想走代理就 `git config --unset http.proxy`（但直连大概率失败）
+解决办法是**把域名固定到一个可用 IP**，用 git 的 `http.curloptResolve`，不需要代理也不需要改 hosts：
+
+```powershell
+git config http.curloptResolve "github.com:443:20.200.245.247"
+```
+
+本仓库已经这样配好，`git push` / VS Code 里点同步都能直接通。
+
+某个 IP 哪天不通了就换一个。候选 IP 和测试方法：
+
+```powershell
+$ips = "140.82.112.4","140.82.114.4","140.82.116.4","20.200.245.247","20.205.243.166","20.27.177.113"
+foreach ($ip in $ips) {
+    $code = & curl.exe -s -o NUL -w "%{http_code}" --resolve "github.com:443:$ip" -m 6 https://github.com
+    "$ip -> $code"
+}
+```
+
+挑返回 200 的那个写回配置即可。若所有 IP 都不通，说明当次校园网把 GitHub 整体拦了，只能等网络恢复或换网络。
