@@ -133,26 +133,37 @@ git fetch origin legacy-hexo
 git checkout legacy-hexo
 ```
 
-### 网络前提（校园网 / 无代理）
+### 网络方案（校园网，无需代理）
 
-这台机器在校园网下，`github.com` 的 DNS 被解析到 `20.6.7.17`，该 IP 被拦，直连必然超时；同时没有可用的本地代理（Clash Verge 装了但不在校园网里开）。
+校园网把 `github.com` 的 DNS 解析污染了（指向 `57.155.223.240` 之类的不可达地址），所以 HTTPS 直连必然超时；但同一台机器上：
 
-解决办法是**把域名固定到一个可用 IP**，用 git 的 `http.curloptResolve`，不需要代理也不需要改 hosts：
+| 目标 | 实测 |
+| --- | --- |
+| `api.github.com:443` | 正常，0.5–2 秒 |
+| `github.com:443` | 全部超时 |
+| **`ssh.github.com:443`** | **正常** |
 
-```powershell
-git config http.curloptResolve "github.com:443:20.200.245.247"
+所以本仓库改用 **SSH over 443**（GitHub 官方为防火墙环境提供的方案），走独立域名，不依赖代理，IP 变了也不影响。
+
+`~/.ssh/config` 内容：
+
+```
+Host github.com
+    HostName ssh.github.com
+    Port 443
+    User git
+    StrictHostKeyChecking accept-new
 ```
 
-本仓库已经这样配好，`git push` / VS Code 里点同步都能直接通。
+远端地址：`git@github.com:JIUMU07/JIUMU07.github.io.git`
 
-某个 IP 哪天不通了就换一个。候选 IP 和测试方法：
+验证：
 
 ```powershell
-$ips = "140.82.112.4","140.82.114.4","140.82.116.4","20.200.245.247","20.205.243.166","20.27.177.113"
-foreach ($ip in $ips) {
-    $code = & curl.exe -s -o NUL -w "%{http_code}" --resolve "github.com:443:$ip" -m 6 https://github.com
-    "$ip -> $code"
-}
+ssh -T git@github.com
+# 期望输出：Hi JIUMU07! You've successfully authenticated...
 ```
 
-挑返回 200 的那个写回配置即可。若所有 IP 都不通，说明当次校园网把 GitHub 整体拦了，只能等网络恢复或换网络。
+换电脑或重装系统后，需要重新走一遍：生成密钥 → 把 `~/.ssh/id_ed25519.pub` 加到 GitHub 的 Settings → SSH and GPG keys → 写入上面的 `~/.ssh/config`。
+
+> 备用思路：如果哪天 `ssh.github.com:443` 也被封，可以回到 `git config http.curloptResolve "github.com:443:<可用IP>"` 把域名钉到某个能连通的 IP，缺点是 IP 变了要手动换。
