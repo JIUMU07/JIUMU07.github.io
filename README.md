@@ -6,15 +6,21 @@
 
 | 工具 | 版本 | 说明 |
 | --- | --- | --- |
+| PowerShell | **7+**（命令 `pwsh`） | 系统自带的 5.1 不支持 `&&`，TLS 和中文编码也有问题 |
+| Git | 任意较新版本 | 推送代码，需先配 `user.name` / `user.email` |
+| Node.js | ≥ 18（建议 22 LTS） | 仅用于生成 Pagefind 搜索索引 |
 | Hugo | ≥ 0.158.0，**extended** 版 | 主题要求；extended 才能处理 webp 封面 |
-| Node.js | ≥ 18 | 仅用于生成 Pagefind 搜索索引 |
 
-检查一下：
+检查一下（在 `pwsh` 里执行）：
 
 ```bash
-hugo version     # 输出里应带 +extended
+pwsh -v          # 应输出 PowerShell 7.x
+git --version
 node -v
+hugo version     # 输出里应带 +extended
 ```
+
+首次搭建时各工具的详细安装步骤（含 PATH 设置、Git 身份配置）见文章 `content/posts/hugo-deploy-guide.md` 第一节。
 
 ## 本地开发（VS Code）
 
@@ -36,6 +42,10 @@ node -v
 - **hugo: 新建文章** — 输入文件名，自动按模板生成草稿
 
 > 需要 `hugo` 在 PATH 中。若终端提示找不到命令，重启一次 VS Code 让新 PATH 生效。
+
+> **两个常见坑**：
+> 1. 手动敲 `hugo server` 时，终端的工作目录必须是项目根目录（`D:\hugo-blog\JIUMU07`）。在别的目录执行不会报错，但会起一个**空站点**，打开就是 `Page Not Found`。用 VS Code 的任务不受影响，任务固定在项目根目录执行。
+> 2. 1313 端口被占用时，Hugo 不会失败，而是自动换一个随机端口（如 `51180`）。所以看到端口和你预期的不一样，先看终端输出里 Hugo 实际打印的地址，并确认是不是已经有一个在运行的了。
 
 ## 写文章
 
