@@ -1,7 +1,7 @@
 ---
 title: 从零把博客部署上线：Hugo + 极简主题 + GitHub Pages
 date: 2026-11-13
-draft: false
+draft: true
 categories: ["技术"]
 tags: ["Hugo", "GitHub Pages", "教程"]
 summary: 从 PowerShell 环境检查开始，一步步把 Hugo 博客推到 GitHub Pages。全程网页点击，不装额外命令行工具，主题配置的坑和真实踩过的报错都记在里面。
