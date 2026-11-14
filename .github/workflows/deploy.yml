@@ -21,6 +21,18 @@ jobs:
       # 用 --gc --minify 而不是 -D：-D 会把草稿一起发布到生产站点
       - run: hugo --gc --minify
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Pagefind 索引必须基于构建产物生成；直接用 npx pagefind --site public
+      # 会跳过中文预处理，导致中文关键词搜不到（pagefind issue #987）
+      - name: Pagefind 索引
+        run: npm run search
+
       - name: 同步到服务器
         uses: burnett01/rsync-deployments@7.0.1
         with:
