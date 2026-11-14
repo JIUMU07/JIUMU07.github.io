@@ -576,7 +576,7 @@ git checkout legacy-hexo
 | Pages 的 Source 里没有 GitHub Actions | 仓库里还没有工作流文件 | 先推 `deploy.yml`，再刷新 Pages 设置 |
 | push 报 `dial tcp ...:443` 超时 | 网络无法直连 github.com | 配代理，见下 |
 
-当然遇到的所有报错或者问题都可以向dsh询问解决，不过要注意的一点是，GitHub那里如果不想自己做做好还是用SSH密钥，不然校园网可能会使得你的端口无法正常使用。
+当然遇到的所有报错或者问题都可以向dsh询问解决，不过要注意的一点是，GitHub那里如果不想自己做最好还是用SSH密钥，不然校园网可能会使得你的端口无法正常使用。
 
 ## 附：代理环境下的配置
 
