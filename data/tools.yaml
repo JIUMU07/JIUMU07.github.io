@@ -1,7 +1,11 @@
 # 工具箱条目：以后加新工具，照下面的格式再写一条即可
 # url 填站内路径(如 /novel/)或完整外链；external: true 时新标签页打开
 items:
-  - name: 小说下载
+  - name: 小说
     icon: 📚
     desc: 在线搜索、阅读与整本下载小说（TXT）
     url: /novel/
+  - name: 漫画
+    icon: 📖
+    desc: 咚漫漫画在线阅读与章节 CBZ 下载
+    url: /manga/
