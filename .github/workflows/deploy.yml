@@ -1,66 +1,32 @@
-name: Deploy to GitHub Pages
+name: deploy
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  workflow_dispatch: {}
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
-          submodules: recursive
-          fetch-depth: 0
+          submodules: true
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
+      - uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "0.169.0"
+          hugo-version: "latest"
           extended: true
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
+      # 用 --gc --minify 而不是 -D：-D 会把草稿一起发布到生产站点
+      - run: hugo --gc --minify
+
+      - name: 同步到服务器
+        uses: burnett01/rsync-deployments@7.0.1
         with:
-          node-version: "22"
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Configure Pages
-        id: pages
-        uses: actions/configure-pages@v6
-
-      - name: Build site
-        run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
-
-      - name: Build search index
-        run: npm run search
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: ./public
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+          switches: -avz --delete
+          path: public/
+          remote_path: /opt/novelsite/blog/public/
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: root
+          remote_key: ${{ secrets.SSH_KEY }}

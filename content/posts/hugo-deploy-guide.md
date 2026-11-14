@@ -7,9 +7,9 @@ tags: ["Hugo", "GitHub Pages", "教程"]
 summary: 从 PowerShell 环境检查开始，一步步把 Hugo 博客推到 GitHub Pages。全程网页点击，不装额外命令行工具，主题配置的坑和真实踩过的报错都记在里面。
 ---
 
-这篇文章记录本站从空目录到上线的完整过程。环境是 Windows + PowerShell 7（命令名 `pwsh`，不是系统自带的那个），但除了装软件那几步，其余在 macOS / Linux 上照做也能通。
+这篇文章记录本站从空目录到上线的完整过程。环境是 Windows + PowerShell 7（命令名 `pwsh`，不是系统自带的那个）。
 
-部署部分全部在 GitHub 网页上点，不需要额外装命令行工具。写在前面：下面每一步都是我自己跑过的，报错也是真报的。遇到问题建议先看最后一节「报错对照表」。
+在目前状态下，其实自己手搓一个博客其实是一件很简单的事情，只需要向dsh许个愿就行了，但是肯定不如自己做浪费时间：-）。
 
 ## 一、先把环境备齐
 
@@ -575,6 +575,8 @@ git checkout legacy-hexo
 | push 报 `Authentication failed` | 还在用账号密码 | 改用 PAT 或 SSH，见「准备推送凭据」 |
 | Pages 的 Source 里没有 GitHub Actions | 仓库里还没有工作流文件 | 先推 `deploy.yml`，再刷新 Pages 设置 |
 | push 报 `dial tcp ...:443` 超时 | 网络无法直连 github.com | 配代理，见下 |
+
+当然遇到的所有报错或者问题都可以向dsh询问解决，不过要注意的一点是，GitHub那里如果不想自己做做好还是用SSH密钥，不然校园网可能会使得你的端口无法正常使用。
 
 ## 附：代理环境下的配置
 
