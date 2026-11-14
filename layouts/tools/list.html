@@ -1,0 +1,86 @@
+{{- define "main" }}
+
+<article class="tools-page" data-pagefind-body>
+  <header class="post-header">
+    <h1 class="post-title">{{ .Title }}</h1>
+    {{- with .Description }}
+    <div class="post-description">{{ . }}</div>
+    {{- end }}
+  </header>
+
+  {{- $items := site.Data.tools.items | default slice }}
+  {{- if gt (len $items) 0 }}
+  <div class="tools-grid">
+    {{- range $items }}
+    {{- if isset . "hidden" }}{{ if .hidden }}{{ continue }}{{ end }}{{ end }}
+    <a class="tool-card" href="{{ .url }}"{{ with .external }} target="_blank" rel="noopener"{{ end }}>
+      <span class="tool-icon">{{ .icon | default "🧰" }}</span>
+      <span class="tool-body">
+        <span class="tool-name">{{ .name }}</span>
+        <span class="tool-desc">{{ with .desc }}{{ . }}{{ end }}</span>
+      </span>
+      <span class="tool-arrow">→</span>
+    </a>
+    {{- end }}
+  </div>
+  {{- else }}
+  <p class="tools-empty">暂无工具，敬请期待。</p>
+  {{- end }}
+
+  {{- if .Content }}
+  <div class="post-content">
+    {{ .Content }}
+  </div>
+  {{- end }}
+</article>
+
+<style>
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+.tool-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--entry);
+    border: 1px solid var(--tertiary);
+    border-radius: 10px;
+    color: var(--primary);
+    text-decoration: none;
+    transition: transform .15s ease, border-color .15s ease;
+}
+.tool-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--secondary);
+}
+.tool-icon {
+    font-size: 30px;
+    line-height: 1;
+}
+.tool-body {
+    display: flex;
+    flex-direction: column;
+}
+.tool-name {
+    font-weight: 600;
+}
+.tool-desc {
+    font-size: 13px;
+    color: var(--secondary);
+    margin-top: 4px;
+}
+.tool-arrow {
+    margin-left: auto;
+    color: var(--secondary);
+}
+.tools-empty {
+    color: var(--secondary);
+    margin-top: 18px;
+}
+</style>
+
+{{- end }}{{/* end main */}}

@@ -78,6 +78,10 @@ menus:
       name: 关于
       url: /about/
       weight: 60
+    - identifier: tools
+      name: 工具箱
+      url: /tools/
+      weight: 70
 
 params:
   env: production
