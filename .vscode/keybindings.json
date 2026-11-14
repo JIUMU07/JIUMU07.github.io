@@ -1,0 +1,18 @@
+// 放置您的自定义按键绑定到此文件以覆盖默认值
+[
+    {
+        "key": "ctrl+alt+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": {
+            "task": "🚀 一键发布到服务器（约10秒）"
+        },
+        "problemMatcher": []
+    },
+    {
+        "key": "ctrl+shift+b",
+        "command": "-workbench.action.tasks.runTask",
+        "args": {
+            "task": "🚀 一键发布到服务器（约10秒）"
+        }
+    }
+]
