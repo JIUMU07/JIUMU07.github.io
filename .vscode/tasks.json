@@ -1,61 +1,72 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "🚀 一键发布到服务器（约10秒）",
-      "type": "shell",
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "publish.ps1"
-      ],
-      "group": { "kind": "build", "isDefault": true },
-      "problemMatcher": []
-    },
-    {
-      "label": "hugo: 本地预览（含草稿）",
-      "type": "shell",
-      "command": "hugo server -D --disableFastRender",
-      "isBackground": true,
-      "problemMatcher": [],
-      "group": { "kind": "build" },
-      "presentation": { "reveal": "always", "panel": "dedicated" }
-    },
-    {
-      "label": "hugo: 构建到 public",
-      "type": "shell",
-      "command": "hugo --gc --minify",
-      "problemMatcher": []
-    },
-    {
-      "label": "hugo: 构建并生成搜索索引",
-      "type": "shell",
-      "command": "npm run build && npm run search",
-      "problemMatcher": []
-    },
-    {
-      "label": "hugo: 带搜索的本地预览",
-      "type": "shell",
-      "command": "npm run build && npm run search && npx -y serve public -l 1414",
-      "isBackground": true,
-      "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "dedicated" }
-    },
-    {
-      "label": "hugo: 新建文章",
-      "type": "shell",
-      "command": "hugo new content posts/${input:postName}.md",
-      "problemMatcher": []
-    }
-  ],
-  "inputs": [
-    {
-      "id": "postName",
-      "type": "promptString",
-      "description": "文章文件名（英文或拼音，短横线分隔，例如 hello-hugo）"
-    }
-  ]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "一键发布到服务器(10秒上线)",
+            "type": "shell",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "publish.ps1"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "hugo: 本地预览（含草稿）",
+            "type": "shell",
+            "command": "hugo server -D --disableFastRender",
+            "isBackground": true,
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "hugo: 构建到 public",
+            "type": "shell",
+            "command": "hugo --gc --minify",
+            "problemMatcher": []
+        },
+        {
+            "label": "hugo: 构建并生成搜索索引",
+            "type": "shell",
+            "command": "npm run build && npm run search",
+            "problemMatcher": []
+        },
+        {
+            "label": "hugo: 带搜索的本地预览",
+            "type": "shell",
+            "command": "npm run build && npm run search && npx -y serve public -l 1414",
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "hugo: 新建文章",
+            "type": "shell",
+            "command": "hugo new content posts/${input:postName}.md",
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "postName",
+            "type": "promptString",
+            "description": "文章文件名（英文或拼音，短横线分隔，例如 hello-hugo）"
+        }
+    ]
 }
