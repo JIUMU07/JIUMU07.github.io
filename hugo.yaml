@@ -94,6 +94,8 @@ params:
   DateFormat: "2006-01-02"
   defaultTheme: auto
   disableThemeToggle: false
+  # 首页所有文章统一卡片样式（关闭"最新一篇大标题居中"的特殊样式）
+  disableSpecial1stPost: true
 
   ShowReadingTime: true
   ShowShareButtons: false
