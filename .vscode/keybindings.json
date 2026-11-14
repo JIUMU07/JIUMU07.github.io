@@ -1,12 +1,12 @@
-// 放置您的自定义按键绑定到此文件以覆盖默认值
+// 发布任务快捷键: Alt+B
+// Ctrl+Shift+B 被输入法表情面板占用; Ctrl+Alt+B 被 AI 聊天扩展占用
 [
     {
-        "key": "ctrl+alt+b",
+        "key": "alt+b",
         "command": "workbench.action.tasks.runTask",
         "args": {
             "task": "🚀 一键发布到服务器（约10秒）"
-        },
-        "problemMatcher": []
+        }
     },
     {
         "key": "ctrl+shift+b",
