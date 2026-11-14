@@ -111,18 +111,24 @@ hugo.yaml            站点配置
 
 ## 部署
 
-线上地址：**https://jiumu07.github.io/**
-仓库：`JIUMU07/JIUMU07.github.io`（用户站点，根路径，无子目录）
+线上地址：**http://8.136.3.4/**（阿里云轻量服务器，Ubuntu 24.04 + nginx）
+站点根目录：`/opt/novelsite/blog/public/`
+仓库：`JIUMU07/JIUMU07.github.io`（保留作版本管理与 CI 触发源）
 
 ### 自动部署
 
-推送到 `main` 即自动构建发布，流程在 `.github/workflows/deploy.yml`：
+推送到 `main` 即自动构建并同步到服务器，流程在 `.github/workflows/deploy.yml`：
 
-1. checkout（含主题 submodule）→ 装 Hugo 0.169.0 extended → 装 Node 20
-2. `npm ci` → `hugo --gc --minify --baseURL <Pages 地址>` → `npm run search`
-3. 上传 `public/` 并用 `actions/deploy-pages` 发布
+1. checkout（含主题 submodule）→ 装 Hugo extended → 装 Node 22
+2. `hugo --gc --minify` 生成 `public/`（不加 `-D`，避免草稿发布到生产）
+3. `npm ci` + `npm run search` 生成 Pagefind 索引到 `public/pagefind/`
+4. `rsync -avz --delete` 同步到 `/opt/novelsite/blog/public/`
 
-Pages 的发布源是 **GitHub Actions**（不是 branch）。改动发布方式需在仓库 Settings → Pages 里切换。
+其中第 3 步不能省：`hugo` 只生成 HTML，搜索索引要 Pagefind 基于产物再扫一遍。缺了它浏览器会去请求 `/pagefind/pagefind-component-ui.js` 拿到 404，站内搜索直接失效。命令用 `npm run search` 而不是裸的 `npx pagefind --site public`，因为前者会先跑 `themes/jijian/scripts/pf-prep.cjs` 做中文分词预处理（pagefind issue #987）。
+
+需要两个 Actions Secret：`SERVER_HOST`（服务器 IP）、`SSH_KEY`（部署用私钥全文）。
+
+> 注意：GitHub Pages 的工作流已被替换，`jiumu07.github.io` 不再更新，停留在迁移前那一版。
 
 ### 历史版本
 
