@@ -1,0 +1,29 @@
+{{- /* ============================================================
+       首页侧栏 —— 任务书 §4.3.4
+       - 最新文章（带小号 muted 日期）
+       - 标签卡（前 12 个 + 「全部标签 →」）
+       不恢复大头像资料卡。
+       ============================================================ */ -}}
+<aside class="home-sidebar">
+    <div class="side-card" id="side-latest">
+        <h3>最新文章</h3>
+        <ul>
+            {{- $latest := where site.RegularPages "Type" "in" (site.Params.mainSections | default (slice "posts")) -}}
+            {{- $latest = where $latest "Params.hiddenInList" "ne" true -}}
+            {{- range first 5 $latest -}}
+            <li>
+                <a href="{{ .RelPermalink }}" title="{{ .Title | plainify }}">{{ .Title | plainify }}</a>
+                <span class="date">{{ .Date.Format "2006-01-02" }}</span>
+            </li>
+            {{- end -}}
+        </ul>
+    </div>
+
+    <div class="side-card side-tags" id="side-tags">
+        <h3>标签</h3>
+        {{- range first 12 site.Taxonomies.tags.ByCount -}}
+        <a class="tag-pill" href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}<span class="count">{{ .Count }}</span></a>
+        {{- end -}}
+        <a class="side-more" href="{{ "/tags/" | relLangURL }}">全部标签 →</a>
+    </div>
+</aside>

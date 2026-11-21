@@ -1,0 +1,122 @@
+{{- /* ============================================================
+       项目级列表覆盖 —— 任务书 §4.1 / §4.3
+       - 首页：hero + 精选大卡（featured: true，否则最新一篇）
+               + 普通卡片（单列 720 宽）+ 侧栏（最新文章/标签）
+       - 其他列表（posts/、tags/xx、categories/xx）：保留主题 page-header，
+         卡片接入 16:9 封面
+       排序逻辑与主题一致：ShowLastMod 默认 true → 按 lastmod 倒序。
+       ============================================================ */ -}}
+{{- define "main" }}
+
+{{- if .IsHome }}
+{{- /* ==================== 首页 ==================== */ -}}
+{{- partial "home_hero.html" . }}
+
+{{- $pages := where site.RegularPages "Type" "in" (site.Params.mainSections | default (slice "posts")) }}
+{{- $pages = where $pages "Params.hiddenInHomeList" "ne" true }}
+{{- $pages = where $pages "Params.hiddenInList" "ne" true }}
+
+{{- /* 排序与主题一致：最后修改时间倒序 */ -}}
+{{- if site.Params.ShowLastMod | default true }}
+    {{- $pages = $pages.ByLastmod.Reverse }}
+{{- else }}
+    {{- $pages = $pages.ByDate.Reverse }}
+{{- end }}
+
+{{- /* 精选大卡：featured: true 优先，否则最新一篇 */ -}}
+{{- $featured := first 1 (where $pages "Params.featured" "eq" true) }}
+{{- if not $featured }}{{- $featured = first 1 $pages }}{{- end }}
+{{- $rest := $pages | complement $featured }}
+
+{{- $paginator := .Paginate ($featured | append $rest) }}
+
+<div class="home-layout">
+    <div class="home-content">
+        {{- range $index, $page := $paginator.Pages }}
+            {{- if and (eq $paginator.PageNumber 1) (eq $index 0) }}
+                {{- partial "design_card.html" (dict "page" $page "eager" true "featured" true) -}}
+            {{- else }}
+                {{- partial "design_card.html" (dict "page" $page "eager" false "featured" false) -}}
+            {{- end }}
+        {{- end }}
+
+        {{- if gt $paginator.TotalPages 1 }}
+        <footer class="page-footer">
+            <nav class="pagination">
+                {{- if $paginator.HasPrev }}
+                <a class="prev" href="{{ $paginator.Prev.URL | relURL }}">«&nbsp;{{ i18n "prev_page" }}&nbsp;</a>
+                {{- end }}
+                {{- if $paginator.HasNext }}
+                <a class="next" href="{{ $paginator.Next.URL | relURL }}">{{- i18n "next_page" }}&nbsp;»</a>
+                {{- end }}
+            </nav>
+        </footer>
+        {{- end }}
+    </div>
+
+    {{- partial "home_sidebar.html" . }}
+</div>
+
+{{- else }}
+{{- /* ============ 非首页列表（posts/、tags/xx、categories/xx） ============ */ -}}
+{{- if not .IsHome | and .Title }}
+<header class="page-header">
+    {{- partial "breadcrumbs.html" . }}
+    <h1>
+        {{ if eq .Data.Plural "tags" }}{{ .Name }}{{ else }}{{ .Title }}{{ end }}
+        {{- if and (or (eq .Kind `term`) (eq .Kind `section`)) (.Param "ShowRssButtonInSectionTermList") }}
+        {{- with .OutputFormats.Get "rss" }}
+        <a href="{{ .RelPermalink }}" title="RSS" aria-label="RSS">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" height="23">
+                <path d="M4 11a9 9 0 0 1 9 9"/>
+                <path d="M4 4a16 16 0 0 1 16 16"/>
+                <circle cx="5" cy="19" r="1"/>
+            </svg>
+        </a>
+        {{- end }}
+        {{- end }}
+    </h1>
+    {{- if .Description }}
+    <div class="post-description">
+        {{ .Description | markdownify }}
+    </div>
+    {{- end }}
+</header>
+{{- end }}
+
+{{- $pages := union .RegularPages .Sections }}
+{{- if eq .Data.Plural "categories" }}
+{{- $pages = $pages.ByDate }}
+{{- else }}
+{{- $pages = where $pages "Params.hiddenInList" "ne" true }}
+{{- end }}
+
+{{- /* 置顶文章排最前 */ -}}
+{{- $pin := where $pages "Params.pin" "gt" 0 }}
+{{- $normal := $pages | complement $pin }}
+{{- $pin = sort $pin "Params.pin" "asc" }}
+{{- $pages = $pin | append $normal }}
+
+{{- $paginator := .Paginate $pages }}
+
+{{- range $index, $page := $paginator.Pages }}
+    {{- partial "design_card.html" (dict "page" $page "eager" (and (eq $paginator.PageNumber 1) (eq $index 0)) "featured" false) -}}
+{{- end }}
+
+{{- if gt $paginator.TotalPages 1 }}
+<footer class="page-footer">
+    <nav class="pagination">
+        {{- if $paginator.HasPrev }}
+        <a class="prev" href="{{ $paginator.Prev.URL | relURL }}">«&nbsp;{{ i18n "prev_page" }}&nbsp;</a>
+        {{- end }}
+        {{- if $paginator.HasNext }}
+        <a class="next" href="{{ $paginator.Next.URL | relURL }}">{{- i18n "next_page" }}&nbsp;»</a>
+        {{- end }}
+    </nav>
+</footer>
+{{- end }}
+
+{{- end }}{{/* end IsHome */}}
+
+{{- end }}{{- /* end main */ -}}

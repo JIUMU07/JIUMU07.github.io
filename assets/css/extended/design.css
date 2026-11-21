@@ -1,0 +1,505 @@
+/* ============================================================
+   站点级视觉层（任务书：站点视觉优化 v1.0）
+   设计令牌：纸白 / 墨蓝；在主题样式之后加载，仅做项目级覆盖。
+   不修改 themes/jijian 子模块。
+   ============================================================ */
+
+/* ---------- 1. 设计令牌（任务书 §3.1） ---------- */
+:root {
+    --paper: #faf8f5;
+    --paper-deep: #f3f0ea;
+    --card: #ffffff;
+    --ink: #1f2328;
+    --muted: #6c6c6c;
+    --line: #e7e2da;
+    --accent: #3d5a80;
+    --accent-soft: #e8eef6;
+    --accent-strong: #2b4260;
+    --radius-lg: 18px;
+    --shadow-card: 0 1px 2px rgba(31, 35, 40, 0.05), 0 4px 14px rgba(31, 35, 40, 0.06);
+    --shadow-card-hover: 0 2px 6px rgba(31, 35, 40, 0.07), 0 10px 28px rgba(31, 35, 40, 0.10);
+    --font-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC",
+        "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
+
+    /* 映射到主题变量（PaperMod 系），令牌单一来源 */
+    --theme: var(--paper);
+    --entry: var(--card);
+    --primary: var(--ink);
+    --secondary: var(--muted);
+    --tertiary: #d9d2c7;
+    --content: var(--ink);
+    --border: var(--line);
+    --code-bg: #f4f1ec;
+    --radius: 14px;
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --paper: #1d1f20;
+    --paper-deep: #232527;
+    --card: #2a2d30;
+    --ink: #e6e6e6;
+    --muted: #a0a0a0;
+    --line: #3a3d40;
+    --accent: #a9c1de;
+    --accent-soft: #27313e;
+    --accent-strong: #cfdff0;
+    --tertiary: #43474b;
+    color-scheme: dark;
+}
+
+/* 列表底色：亮色用暖纸灰，暗色回到主题底色让卡片浮出 */
+.list {
+    background: var(--paper-deep);
+}
+[data-theme="dark"] .list {
+    background: var(--theme);
+}
+
+/* ---------- 2. 全局细节（任务书 §4.7） ---------- */
+::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+}
+:root[data-theme="dark"] ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #c9c2b6;
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #b3aa9c;
+}
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #3a3d40;
+}
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #4a4e53;
+}
+
+body {
+    font-family: var(--font-sans);
+}
+
+/* ---------- 3. 字体与排版（任务书 §4.5） ---------- */
+/* 标题衬线，正文无衬线 */
+.post-title,
+.first-entry .entry-header h1,
+.page-header h1,
+.entry-header h2,
+.home-hero .hero-name,
+.featured-entry .entry-header h2 {
+    font-family: var(--font-serif);
+    letter-spacing: 0.01em;
+}
+
+/* 卡片标题 19–21px（主题默认 24px） */
+.entry-header h2 {
+    font-size: 20px;
+}
+
+/* 精选大卡标题 */
+.featured-entry .entry-header h2 {
+    font-size: 24px;
+}
+
+/* 文章正文 17px / 1.85 */
+.post-content {
+    font-size: 17px;
+    line-height: 1.85;
+}
+
+/* 摘要 14–15px，精选 3 行 */
+.entry-content {
+    font-size: 14px;
+    line-height: 1.7;
+}
+.featured-entry .entry-content {
+    font-size: 15px;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+/* ---------- 4. Header：吸顶 + 毛玻璃 + 当前栏目下划线（任务书 §4.3.5） ---------- */
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(250, 248, 245, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+}
+:root[data-theme="dark"] .header {
+    background: rgba(29, 31, 32, 0.82);
+}
+
+/* 当前栏目下划线改为 accent 色 */
+#menu > li > a > span::after {
+    background: var(--accent);
+}
+
+/* 移动端菜单按钮 44×44 触控区（任务书 §4.3.5） */
+button.menu-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
+}
+#theme-toggle,
+#search-icon-btn {
+    padding: 10px;
+    box-sizing: content-box;
+}
+.logo-switches {
+    margin-inline-start: 4px;
+}
+
+/* ---------- 5. 卡片（任务书 §4.3.3 + §4.1.4） ---------- */
+.post-entry {
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+/* hover 左侧 2px accent 线 */
+.post-entry::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.post-entry:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--accent);
+}
+.post-entry:hover::before {
+    opacity: 1;
+}
+.post-entry:active {
+    transform: translateY(0) scale(0.995);
+}
+
+/* 卡片封面 16:9（真实图或渐变占位），固定比例防 CLS */
+.entry-card-cover {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    margin: 0 0 14px;
+    border-radius: calc(var(--radius) - 6px);
+    overflow: hidden;
+    background: var(--accent-soft);
+}
+.entry-card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.entry-card-cover.grad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.entry-card-cover.grad span {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+}
+.featured-entry .entry-card-cover {
+    border-radius: calc(var(--radius-lg) - 6px);
+}
+
+/* 精选大卡 */
+.featured-entry {
+    padding: calc(var(--gap) + 2px);
+}
+.featured-entry .entry-footer {
+    font-size: 13px;
+}
+.featured-entry .entry-footer .entry-tags {
+    margin-inline-end: 8px;
+}
+
+/* 卡片 footer 内标签 pill */
+.entry-footer .entry-tag {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 1px 9px;
+    margin-inline-end: 6px;
+    font-size: 12px;
+}
+.entry-footer .post-date {
+    color: var(--muted);
+}
+
+/* ---------- 6. 首页布局：hero + 内容列 + 侧栏（任务书 §4.3） ---------- */
+.home-hero {
+    margin: 6px 0 var(--gap);
+    padding-bottom: var(--gap);
+    border-bottom: 1px solid var(--line);
+}
+.home-hero .hero-name {
+    font-size: 27px;
+    line-height: 1.3;
+    margin: 0 0 4px;
+}
+.home-hero .hero-tagline {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+}
+
+/* 首页加宽以容纳侧栏（仅 body.home-profile 生效） */
+body.home-profile .main {
+    max-width: min(calc(720px + 300px + var(--gap) * 4), 100vw);
+}
+.home-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    column-gap: var(--gap);
+    align-items: start;
+}
+.home-content {
+    min-width: 0;
+}
+
+/* 侧栏 */
+.home-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + var(--gap));
+    font-size: 14px;
+}
+.side-card {
+    background: var(--entry);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 16px 18px;
+    margin-bottom: var(--gap);
+}
+.side-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 0 0 10px;
+}
+.side-card ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.side-card li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0;
+    border-top: 1px dashed var(--line);
+}
+.side-card li:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+.side-card li a {
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+.side-card li .date {
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.side-tags .tag-pill {
+    display: inline-block;
+    margin: 0 8px 8px 0;
+    padding: 2px 10px;
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+}
+.side-tags .tag-pill .count {
+    opacity: 0.65;
+    margin-inline-start: 2px;
+}
+.side-more {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--accent);
+}
+
+/* 移动端：单列，侧栏移到列表下方 */
+@media (max-width: 900px) {
+    body.home-profile .main {
+        max-width: min(calc(var(--main-width) + var(--gap) * 2), 100vw);
+    }
+    .home-layout {
+        grid-template-columns: minmax(0, 1fr);
+        column-gap: 0;
+    }
+    .home-sidebar {
+        position: static;
+    }
+    .home-hero .hero-name {
+        font-size: 22px;
+    }
+}
+
+/* ---------- 7. 文章页（任务书 §4.4） ---------- */
+/* 标题层级：h2 accent 竖线，h3 降一级 */
+.post-content h2 {
+    border-left: 3px solid var(--accent);
+    padding-left: 12px;
+    margin-top: 2.2em;
+}
+.post-content h3 {
+    font-size: 1.12em;
+    margin-top: 1.8em;
+}
+
+/* 表格横向滚动容器（由 article.js 包裹） */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-block: 1em;
+}
+.table-scroll table {
+    min-width: 100%;
+}
+
+/* TOC 滚动高亮（任务书 §4.4.1） */
+.toc .inner a {
+    border-inline-start: 2px solid transparent;
+    transition: border-color 0.15s ease, color 0.15s ease, font-weight 0.15s ease;
+}
+.toc .inner a.active {
+    color: var(--accent);
+    border-inline-start-color: var(--accent);
+    font-weight: 600;
+}
+
+/* TOC 响应式（任务书 §4.4.1 / §2.2.13）：
+   主题的浮动 TOC 固定在正文列外侧，视口 < 1150px 时放不下。
+   中窄屏把 post-container 改为上下堆叠，TOC 变成正文上方的
+   折叠面板（details/summary 即「目录」按钮，JS 默认收起），
+   不覆盖主题 ≤768px 的 display:none 逻辑冲突项。 */
+@media (max-width: 1150px) {
+    .post-container {
+        flex-direction: column;
+    }
+    .toc-sidebar {
+        position: static !important;
+        transform: none !important;
+        inset: auto !important;
+        display: block;
+        width: 100%;
+        max-width: var(--main-width);
+        margin: 0 0 var(--gap);
+        max-height: none;
+    }
+    .toc-sidebar.left,
+    .toc-sidebar.right {
+        left: auto;
+        right: auto;
+    }
+}
+
+/* 文章标签 pill */
+.post-tags li a {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 999px;
+    padding: 2px 12px;
+    font-size: 13px;
+}
+
+/* ---------- 8. 404（任务书 §4.7） ---------- */
+.page-404 {
+    text-align: center;
+    padding: 72px 0 48px;
+}
+.page-404 .code {
+    font-family: var(--font-serif);
+    font-size: 64px;
+    line-height: 1.2;
+    color: var(--accent);
+    margin: 0 0 8px;
+}
+.page-404 .msg {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0 0 28px;
+}
+.page-404 .actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.page-404 .btn {
+    display: inline-block;
+    padding: 9px 22px;
+    border-radius: 999px;
+    font-size: 14px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: transparent;
+}
+.page-404 .btn.primary {
+    background: var(--accent);
+    color: #ffffff;
+    border-color: var(--accent);
+}
+:root[data-theme="dark"] .page-404 .btn.primary {
+    color: var(--accent-strong);
+}
+.page-404 .btn:hover {
+    opacity: 0.88;
+}
+
+/* ---------- 9. 动效规范（任务书 §3.3）：减少动效优先 ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .post-entry,
+    .post-entry:hover,
+    .post-entry:active {
+        transform: none;
+    }
+}

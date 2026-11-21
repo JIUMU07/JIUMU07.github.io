@@ -1,0 +1,11 @@
+{{- /* 项目级 404 —— 任务书 §4.7：一句人话 + 回首页/搜索按钮 */ -}}
+{{- define "main" }}
+<div class="page-404">
+    <p class="code">404</p>
+    <p class="msg">这里什么都没有 —— 页面可能被移动或删除了。</p>
+    <div class="actions">
+        <a class="btn primary" href="{{ "" | relLangURL }}">回首页</a>
+        <a class="btn" href="{{ "/search/" | relLangURL }}">去搜索</a>
+    </div>
+</div>
+{{- end }}

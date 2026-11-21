@@ -2,7 +2,8 @@
        改动：移除 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
        原因：站点目前只有 http://8.136.3.4，没有 TLS。该 meta 会让浏览器把 CSS/JS
        升级成 https 请求，全部失败，页面无样式。
-       其余内容（封面悬停预览样式）与主题保持一致。 */ -}}
+       其余内容（封面悬停预览样式）与主题保持一致。
+       视觉优化 v1.0 新增：文章页增强脚本 article.js（仅文章页加载） */ -}}
 
 <style>
     /* 鼠标悬停封面图预览 */
@@ -51,5 +52,12 @@
     }
 
 </style>
+
+{{- /* 文章页增强：TOC scrollspy / 表格滚动 / 移动端 TOC 折叠
+       （复制按钮与图片放大由主题 footer + medium-zoom 提供） */ -}}
+{{- $isEncrypted := or (and .File (in .File.Path "protected")) .Params.mima .Params.password -}}
+{{- if and .IsPage (not $isEncrypted) }}
+<script defer src="{{ "/js/article.js" | relURL }}"></script>
+{{- end }}
 
 {{- /* Head custom content area end */ -}}

@@ -1,0 +1,9 @@
+{{- /* ============================================================
+       首页 hero —— 任务书 §4.3.1 / §4.5
+       名字用衬线字标（桌面 26–28px，手机 22px），一句话副标。
+       源机器工作区的动漫头像待 bundle 合入后可在此恢复。
+       ============================================================ */ -}}
+<div class="home-hero">
+    <p class="hero-name">{{ site.Params.label.text | default site.Title }}</p>
+    <p class="hero-tagline">{{ site.Params.description | default "随手记录，慢慢积累。" }}</p>
+</div>

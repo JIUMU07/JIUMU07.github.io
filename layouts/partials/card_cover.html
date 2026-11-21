@@ -1,0 +1,54 @@
+{{- /* ============================================================
+       卡片封面（16:9）—— 任务书 §4.1
+       1. front matter 有 cover.image / images[0] → 用真实图，object-fit: cover；
+       2. 没有图 → 按第一个标签映射冷色渐变（蓝/灰绿/雾紫/钢灰），
+          中央放标签名或文章首字；不请求外部图片，断网不裂图；
+       3. 固定 aspect-ratio: 16/9，避免 CLS；
+       4. loading 默认 lazy，首屏第一张传 eager=true。
+       用法：{{ partial "card_cover.html" (dict "page" . "eager" $eager) }}
+       ============================================================ */ -}}
+
+{{- $page := .page -}}
+{{- $eager := .eager | default false -}}
+
+{{- $imgPath := "" -}}
+{{- if $page.Params.cover.image -}}
+    {{- $imgPath = $page.Params.cover.image -}}
+{{- else if $page.Params.images -}}
+    {{- $imgPath = index $page.Params.images 0 -}}
+{{- end -}}
+
+{{- $firstTag := "" -}}
+{{- with $page.Params.tags -}}{{- $firstTag = index . 0 -}}{{- end -}}
+
+{{- if $imgPath -}}
+{{- /* 有图：优先页面 bundle 资源，其次按路径引用（支持绝对/相对/外链） */ -}}
+<figure class="entry-card-cover">
+    {{- $imgRes := ($page.Resources.ByType "image").GetMatch (printf "*%s*" $imgPath) -}}
+    {{- if $imgRes -}}
+        <img src="{{ $imgRes.RelPermalink }}" alt="{{ $page.Title | plainify }}"
+            loading="{{ if $eager }}eager{{ else }}lazy{{ end }}" decoding="async">
+    {{- else if or (hasPrefix $imgPath "http://") (hasPrefix $imgPath "https://") -}}
+        <img src="{{ $imgPath }}" alt="{{ $page.Title | plainify }}"
+            loading="{{ if $eager }}eager{{ else }}lazy{{ end }}" decoding="async">
+    {{- else -}}
+        <img src="{{ $imgPath | relURL }}" alt="{{ $page.Title | plainify }}"
+            loading="{{ if $eager }}eager{{ else }}lazy{{ end }}" decoding="async">
+    {{- end -}}
+</figure>
+{{- else -}}
+{{- /* 无图：按第一个标签映射渐变，全部为冷色/灰绿/雾紫/钢灰，不回到黄棕 */ -}}
+{{- $grad := "#64748b, #475569" -}}{{- /* 默认：钢灰 */ -}}
+{{- if $firstTag -}}
+    {{- if findRE "教程|部署|指南|Hugo|Hexo|技术|服务器|Linux|Docker|Git|网络|VirtualLAN|Minecraft|MC|开服|整合包" $firstTag -}}
+        {{- $grad = "#4a6f9f, #2b4260" -}}{{- /* 蓝 */ -}}
+    {{- else if findRE "生活|随笔|记录|思考|杂谈|折腾|日常" $firstTag -}}
+        {{- $grad = "#6e8b7b, #4e6657" -}}{{- /* 灰绿 */ -}}
+    {{- else if findRE "漫画|动漫|小说|游戏|番剧|影音" $firstTag -}}
+        {{- $grad = "#8b7fa8, #5d5478" -}}{{- /* 雾紫 */ -}}
+    {{- end -}}
+{{- end -}}
+<figure class="entry-card-cover grad" style="background: linear-gradient(135deg, {{ $grad }});" aria-hidden="true">
+    <span>{{ if $firstTag }}{{ $firstTag }}{{ else }}{{ substr ($page.Title | plainify) 0 1 }}{{ end }}</span>
+</figure>
+{{- end -}}
