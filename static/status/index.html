@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>服务状态 · 就暮</title>
+<meta name="theme-color" content="#8c4000">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root{--bg:#f7f3ec;--card:#fffdf9;--line:#e6ddcf;--text:#3a3229;--dim:#8a8175;--green:#137333;--red:#c62828;--brown:#8c4000}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:15px/1.7 -apple-system,"Segoe UI",Roboto,"Noto Sans SC",sans-serif}
+  .global-nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;width:100%;box-sizing:border-box;max-width:848px;margin:12px auto 0;padding:8px 12px;background:#fffdf9;border:1px solid var(--line);border-radius:12px;font-size:13px}
+  .global-nav a{padding:5px 10px;border-radius:8px;color:#7a5a33;text-decoration:none}
+  .global-nav a:hover{background:#f3ece0}
+  .global-nav a.on{background:#f0e6d6;color:var(--brown);font-weight:600}
+  main{max-width:880px;margin:0 auto;padding:24px 16px 60px}
+  h1{font-size:24px;margin:8px 0 4px}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .cards+.cards{margin-top:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .card h2{font-size:15px;margin:0 0 8px;display:flex;align-items:center;justify-content:space-between}
+  .st{font-size:12px;padding:2px 8px;border-radius:9px;background:#eee}
+  .st.ok{background:#e6f4ea;color:var(--green)}
+  .st.bad{background:#fdecea;color:var(--red)}
+  .st.wait{background:#fdf3e2;color:#9a6b12}
+  .meta{font-size:12px;color:var(--dim)}
+  .meta+.meta{margin-top:4px}
+  .meta.warn{color:#9a6b12}
+  .bar{height:6px;background:#f0ebe2;border-radius:4px;overflow:hidden;margin-top:10px}
+  .bar>i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+  .foot{margin-top:18px;font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<nav class="global-nav">
+  <a href="/">🏠 博客</a>
+  <a href="/novel/">📚 小说</a>
+  <a href="/manga/">📖 漫画</a>
+  <a href="/anime/">📺 动漫</a>
+  <a href="/status/" class="on">📡 状态</a>
+</nav>
+<main>
+  <h1>📡 服务状态</h1>
+  <div class="sub">页面每 30 秒刷新 · 24h 可用率由服务器每 5 分钟采样 · 只检测可达性，不碰用户数据</div>
+  <div class="cards" id="sys"></div>
+  <div class="cards" id="cards"></div>
+  <div class="foot">最后刷新：<span id="ts">-</span> · 24h 采样：<span id="win">加载中</span></div>
+</main>
+<script>
+const TARGETS = [
+  { id: "blog", name: "博客首页", icon: "🏠", url: "/" },
+  { id: "novel", name: "小说工具", icon: "📚", url: "/novel/" },
+  { id: "novel_api", name: "小说接口", icon: "🔌", url: "/novel/api/health" },
+  { id: "manga", name: "漫画工具", icon: "📖", url: "/manga/" },
+  { id: "manga_api", name: "漫画接口", icon: "🔌", url: "/manga/api/health" },
+  { id: "anime", name: "动漫工具", icon: "📺", url: "/anime/" },
+  { id: "anime_api", name: "动漫接口", icon: "🔌", url: "/anime/api/health" }
+];
+
+let CERT = null, UPTIME = null;
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+async function loadAux() {
+  const get = async (u) => { try { const r = await fetch(u, { cache: "no-store" }); return r.ok ? await r.json() : null; } catch (e) { return null; } };
+  [CERT, UPTIME] = await Promise.all([get("/cert.json"), get("/uptime.json")]);
+}
+
+function renderSys() {
+  const wrap = document.getElementById("sys");
+  wrap.innerHTML = "";
+  const card = el("div", "card");
+  const h = el("h2");
+  h.appendChild(el("span", "", "🔐 HTTPS 证书"));
+  const badge = el("span", "st wait", "读取中");
+  h.appendChild(badge);
+  card.appendChild(h);
+  const meta = el("div", "meta", "—");
+  card.appendChild(meta);
+  const bar = el("div", "bar");
+  const fill = el("i");
+  bar.appendChild(fill);
+  card.appendChild(bar);
+  wrap.appendChild(card);
+
+  if (!CERT || typeof CERT.days !== "number") {
+    badge.className = "st wait";
+    badge.textContent = "未知";
+    meta.textContent = "暂时读不到证书信息（cert.json 未生成）";
+    return;
+  }
+  const d = CERT.days;
+  badge.className = "st " + (d <= 7 ? "bad" : d <= 21 ? "wait" : "ok");
+  badge.textContent = d <= 7 ? "即将到期" : d <= 21 ? "请注意" : "正常";
+  meta.textContent = `剩余 ${d} 天 · 到期 ${CERT.not_after} · 检查于 ${CERT.checked_at}`;
+  fill.style.width = Math.max(4, Math.min(100, (d / 90) * 100)) + "%";
+  fill.style.background = d <= 7 ? "var(--red)" : d <= 21 ? "#c98a1a" : "var(--green)";
+}
+
+async function check(t) {
+  const started = performance.now();
+  try {
+    const r = await fetch(t.url, { method: "GET", cache: "no-store", credentials: "omit" });
+    const ms = Math.round(performance.now() - started);
+    // 401/403 说明服务活着，只是需要令牌
+    const up = r.status < 500;
+    return { up, code: r.status, ms };
+  } catch (e) {
+    return { up: false, code: "ERR", ms: Math.round(performance.now() - started) };
+  }
+}
+
+async function render() {
+  const wrap = document.getElementById("cards");
+  wrap.innerHTML = "";
+  const rows = TARGETS.map((t) => ({ t, node: null }));
+  rows.forEach(({ t }) => {
+    const card = el("div", "card");
+    const h = el("h2");
+    h.appendChild(el("span", "", `${t.icon} ${t.name}`));
+    const badge = el("span", "st wait", "检测中");
+    h.appendChild(badge);
+    card.appendChild(h);
+    const meta = el("div", "meta", "—");
+    card.appendChild(meta);
+    const hist = el("div", "meta", "");
+    card.appendChild(hist);
+    const bar = el("div", "bar");
+    const fill = el("i");
+    bar.appendChild(fill);
+    card.appendChild(bar);
+    wrap.appendChild(card);
+    rows.find((r) => r.t === t).node = { badge, meta, hist, fill };
+  });
+
+  await Promise.all(rows.map(async ({ t, node }) => {
+    const r = await check(t);
+    node.badge.textContent = r.up ? "正常" : "异常";
+    node.badge.className = "st " + (r.up ? "ok" : "bad");
+    node.meta.textContent = `${r.up ? "可达" : "不可达"} · HTTP ${r.code} · ${r.ms}ms`;
+    node.fill.style.width = Math.min(100, Math.max(8, 100 - r.ms / 30)) + "%";
+    node.fill.style.background = r.up ? "var(--green)" : "var(--red)";
+
+    const u = UPTIME && UPTIME.services && UPTIME.services[t.id];
+    if (u && u.samples >= 3) {
+      node.hist.textContent = `24h 可用率 ${u.uptime}% · 平均 ${u.avg_ms}ms · ${u.samples} 次采样` +
+        (u.last_fail ? ` · 最近故障 ${u.last_fail}` : "");
+      node.hist.className = "meta" + (u.uptime < 99 ? " warn" : "");
+    }
+  }));
+  document.getElementById("ts").textContent = new Date().toLocaleTimeString();
+  document.getElementById("win").textContent = UPTIME ? (UPTIME.generated_at + "（24h）") : "采样中";
+}
+
+(async () => {
+  await loadAux();
+  renderSys();
+  await render();
+})();
+setInterval(render, 30000);
+setInterval(async () => { await loadAux(); renderSys(); }, 300000);
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+</script>
+</body>
+</html>

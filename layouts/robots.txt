@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /novel/
+Disallow: /manga/
+Disallow: /anime/
+Disallow: /status/
+
+Sitemap: {{ "sitemap.xml" | absURL }}
