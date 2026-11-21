@@ -1,7 +1,7 @@
 {{- $name := site.Params.label.text | default site.Title -}}
 {{- $tagline := .Content | plainify | strings.TrimSpace -}}
 <section class="home-hero">
-  <img class="hero-avatar" src="{{ "icon-192.png" | relURL }}" alt="{{ $name }}" width="72" height="72" loading="eager">
+  <img class="hero-avatar" src="{{ "images/avatar.png" | relURL }}" alt="{{ $name }}" width="72" height="72" loading="eager">
   <div class="hero-body">
     <h1 class="hero-name">{{ $name }}</h1>
     <p class="hero-desc">{{ if $tagline }}{{ $tagline }}{{ else }}{{ site.Params.description }}{{ end }}</p>
