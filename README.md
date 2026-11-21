@@ -111,7 +111,8 @@ hugo.yaml            站点配置
 
 ## 部署
 
-线上地址：**http://8.136.3.4/**（阿里云轻量服务器，Ubuntu 24.04 + nginx）
+线上地址：**https://huangth.xyz/**（腾讯云轻量 · 首尔，Ubuntu 24.04 + nginx，Let's Encrypt 证书）
+备用地址：`http://43.155.201.213/`（IP 直连，HTTPS 域名不可用时兜底）
 站点根目录：`/opt/novelsite/blog/public/`
 仓库：`JIUMU07/JIUMU07.github.io`（保留作版本管理与 CI 触发源）
 

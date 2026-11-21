@@ -7,5 +7,9 @@ items:
     url: /novel/
   - name: 漫画
     icon: 📖
-    desc: 咚漫漫画在线阅读与章节 CBZ 下载
+    desc: 漫画在线阅读与章节 CBZ 下载
     url: /manga/
+  - name: 动漫
+    icon: 📺
+    desc: 番剧在线搜索、选集与播放（HLS）
+    url: /anime/

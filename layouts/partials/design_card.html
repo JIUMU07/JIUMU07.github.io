@@ -25,6 +25,7 @@
     <header class="entry-header">
         <h2 class="entry-hint-parent">
             {{- $page.Title }}
+            {{- if .featured }}<span class="entry-badge">最新</span>{{ end }}
             <span class="entry-hint-container">
                 {{- if $page.Draft }}
                 <span class="entry-hint" title="Draft">

@@ -1,9 +1,16 @@
-{{- /* ============================================================
-       首页 hero —— 任务书 §4.3.1 / §4.5
-       名字用衬线字标（桌面 26–28px，手机 22px），一句话副标。
-       源机器工作区的动漫头像待 bundle 合入后可在此恢复。
-       ============================================================ */ -}}
-<div class="home-hero">
-    <p class="hero-name">{{ site.Params.label.text | default site.Title }}</p>
-    <p class="hero-tagline">{{ site.Params.description | default "随手记录，慢慢积累。" }}</p>
-</div>
+{{- /* 首页 hero —— 合并结果：基线结构（头像 + GitHub/RSS 链接，副标取 _index.md）
+       + design 分支的衬线字标样式（design.css）。
+       头像资源 static/images/avatar.png 由基线快照提供，必须保留。 */ -}}
+{{- $name := site.Params.label.text | default site.Title -}}
+{{- $tagline := .Content | plainify | strings.TrimSpace -}}
+<section class="home-hero">
+  <img class="hero-avatar" src="{{ "images/avatar.png" | relURL }}" alt="{{ $name }}" width="72" height="72" loading="eager">
+  <div class="hero-body">
+    <h1 class="hero-name">{{ $name }}</h1>
+    <p class="hero-desc">{{ if $tagline }}{{ $tagline }}{{ else }}{{ site.Params.description }}{{ end }}</p>
+    <div class="hero-links">
+      <a href="https://github.com/JIUMU07" target="_blank" rel="noopener">GitHub</a>
+      <a href="{{ "index.xml" | relURL }}">RSS</a>
+    </div>
+  </div>
+</section>

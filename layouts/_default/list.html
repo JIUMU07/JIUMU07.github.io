@@ -1,9 +1,9 @@
 {{- /* ============================================================
-       项目级列表覆盖 —— 任务书 §4.1 / §4.3
-       - 首页：hero + 精选大卡（featured: true，否则最新一篇）
-               + 普通卡片（单列 720 宽）+ 侧栏（最新文章/标签）
-       - 其他列表（posts/、tags/xx、categories/xx）：保留主题 page-header，
-         卡片接入 16:9 封面
+       项目级列表覆盖 —— 任务书 §4.1 / §4.3，合并结果（design 为主）
+       - 首页：hero（头像版）+ 精选大卡（featured: true，否则最新一篇，
+         带「最新」徽章）+ 普通卡片（单列 720 宽）+ 侧栏（最新文章/标签）
+       - 其他列表（posts/、tags/xx、categories/xx）：保留主题 page-header
+         与 .Content 渲染（基线移植），卡片接入 16:9 封面
        排序逻辑与主题一致：ShowLastMod 默认 true → 按 lastmod 倒序。
        ============================================================ */ -}}
 {{- define "main" }}
@@ -83,6 +83,15 @@
     </div>
     {{- end }}
 </header>
+{{- end }}
+
+{{- /* 列表页自身的说明内容（基线移植：_index.md / 分类描述等） */ -}}
+{{- if .Content }}
+<div class="post-content">
+    {{- if (.Param "enableAnchoredHeadings") }}
+    {{- partial "anchored_headings.html" .Content -}}
+    {{- else }}{{ .Content }}{{ end }}
+</div>
 {{- end }}
 
 {{- $pages := union .RegularPages .Sections }}

@@ -1,4 +1,4 @@
-baseURL: https://jiumu07.github.io/
+baseURL: https://huangth.xyz/
 title: 今天也要好好吃饭
 locale: zh-cn
 defaultContentLanguage: zh-cn
@@ -70,10 +70,6 @@ menus:
       name: 标签
       url: /tags/
       weight: 40
-    - identifier: search
-      name: 搜索
-      url: /search/
-      weight: 50
     - identifier: about
       name: 关于
       url: /about/

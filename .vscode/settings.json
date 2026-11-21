@@ -1,0 +1,9 @@
+{
+  // 中文博客里全角标点（，。：；（）“”）是正常排版，
+  // 关闭 VS Code 的「易混淆字符」高亮，避免满屏红框。
+  // 需要检查代码块里是否混入全角符号时，可临时改回 true。
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  "files.encoding": "utf8",
+  "files.eol": "\n"
+}

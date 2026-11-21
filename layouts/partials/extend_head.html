@@ -3,7 +3,12 @@
        原因：站点目前只有 http://8.136.3.4，没有 TLS。该 meta 会让浏览器把 CSS/JS
        升级成 https 请求，全部失败，页面无样式。
        其余内容（封面悬停预览样式）与主题保持一致。
-       视觉优化 v1.0 新增：文章页增强脚本 article.js（仅文章页加载） */ -}}
+       视觉优化 v1.0 新增：文章页增强脚本 article.js（仅文章页加载）。
+       合并说明（baseline-2026-11-21）：保留基线的 chroma .err 修复、paginav 修复、
+       /manifest.webmanifest 引用与 Service Worker 注册；基线的 layout-polish 排版块
+       已按「design 视觉为主」原则移植进 assets/css/extended/design.css（含 h2 左侧
+       accent 竖线、衬线标题、卡片 hover accent 线等设计令牌决策），不再内联，
+       避免内联样式覆盖设计令牌。 */ -}}
 
 <style>
     /* 鼠标悬停封面图预览 */
@@ -51,7 +56,40 @@
         }
     }
 
+    /* Chroma 语法高亮：URL 的冒号在 powershell/bash 代码块里会被标成 err（红底块），
+       中文博客不需要这种“报错”底色，统一还原为普通文字 */
+    .chroma .err,
+    :root[data-theme="dark"] .chroma .err {
+        color: inherit !important;
+        background: none !important;
+    }
+
+    /* 上一篇/下一篇：只剩一个时铺满整行，避免右半边空白且点不到；
+       同时加上下留白，避免文字贴着卡片边缘显得拥挤 */
+    .paginav a:only-child {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .paginav a {
+        display: block;
+        box-sizing: border-box;
+        padding: 14px 18px;
+        line-height: 1.6;
+    }
+    .paginav a br {
+        display: none;
+    }
+    .paginav .title {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
 </style>
+
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#3d5a80">
+<script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});});}</script>
 
 {{- /* 文章页增强：TOC scrollspy / 表格滚动 / 移动端 TOC 折叠
        （复制按钮与图片放大由主题 footer + medium-zoom 提供） */ -}}
