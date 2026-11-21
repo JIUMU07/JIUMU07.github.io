@@ -1,0 +1,20 @@
+{{- $name := site.Params.label.text | default site.Title -}}
+<aside class="home-sidebar">
+  <div class="side-card">
+    <h3 class="side-title">标签</h3>
+    <div class="side-tags">
+      {{- range first 12 site.Taxonomies.tags.ByCount }}
+      <a href="{{ .Page.RelPermalink }}">#{{ .Page.Title }}<span>{{ .Count }}</span></a>
+      {{- end }}
+    </div>
+  </div>
+
+  <div class="side-card">
+    <h3 class="side-title">最新</h3>
+    <ul class="side-posts">
+      {{- range first 5 (where site.RegularPages "Section" "posts") }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{- end }}
+    </ul>
+  </div>
+</aside>

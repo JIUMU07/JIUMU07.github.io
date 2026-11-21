@@ -1,0 +1,13 @@
+{{- $name := site.Params.label.text | default site.Title -}}
+{{- $tagline := .Content | plainify | strings.TrimSpace -}}
+<section class="home-hero">
+  <img class="hero-avatar" src="{{ "icon-192.png" | relURL }}" alt="{{ $name }}" width="72" height="72" loading="eager">
+  <div class="hero-body">
+    <h1 class="hero-name">{{ $name }}</h1>
+    <p class="hero-desc">{{ if $tagline }}{{ $tagline }}{{ else }}{{ site.Params.description }}{{ end }}</p>
+    <div class="hero-links">
+      <a href="https://github.com/JIUMU07" target="_blank" rel="noopener">GitHub</a>
+      <a href="{{ "index.xml" | relURL }}">RSS</a>
+    </div>
+  </div>
+</section>
