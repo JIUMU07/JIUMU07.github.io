@@ -5,7 +5,7 @@ draft: false
 categories: ["技术"]
 tags: ["Minecraft", "整合包", "开服", "教程", "ServerPackCreator", "Forge", "Fabric"]
 cover:
-  image: "/images/covers/mc-server-v3.jpg"
+  image: "/images/covers/mc-server-v4.jpg"
   alt: "Minecraft 整合包开服封面"
   credit: "Image: Minecraft"
 summary: 整合包只发客户端时，用 ServerPackCreator 直接生成服务端包：它会扫描 mod 的 sideness、自动排除纯客户端 mod，并生成启动脚本。本文只讲这一种方法，从下载、GUI/CLI 生成到启动、验证和更新。
@@ -361,4 +361,5 @@ find /backup -name 'mc-*.tar.gz' -mtime +7 -delete
 - 每次整合包更新都重新生成一份，别在旧服务端上直接替换 `mods/`。
 
 一句话总结：**让 ServerPackCreator 做“区分 mod”这件脏活，你只负责启动和调参。**
+
 
