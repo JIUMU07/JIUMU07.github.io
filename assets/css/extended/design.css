@@ -401,6 +401,9 @@ body.home-profile .main {
 
 /* 移动端：单列，侧栏移到列表下方 */
 @media (max-width: 900px) {
+    body.home-profile {
+        --nav-width: var(--main-width);
+    }
     body.home-profile .main {
         max-width: min(calc(var(--main-width) + var(--gap) * 2), 100vw);
     }
