@@ -192,7 +192,7 @@ button.menu-toggle {
 .post-entry:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
-    border-color: var(--accent);
+    border-color: var(--line);
 }
 .post-entry:hover::before {
     opacity: 1;
