@@ -595,6 +595,23 @@ body:not(.home-profile) {
     border-inline-start-color: var(--accent);
     font-weight: 600;
 }
+/* TOC：去掉列表圆点，只保留 active 左边线，避免圆点和竖线叠成「├」 */
+.toc .inner > ul,
+.toc .inner ul ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+}
+.toc .inner ul ul {
+    padding-left: 14px;
+}
+.toc .inner li {
+    margin: 5px 0;
+}
+.toc .inner a {
+    display: block;
+    padding-left: 9px;
+}
 
 /* TOC 响应式（任务书 §4.4.1 / §2.2.13）：
    主题的浮动 TOC 固定在正文列外侧，视口 < 1150px 时放不下。
