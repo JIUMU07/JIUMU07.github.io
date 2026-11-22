@@ -708,3 +708,8 @@ body:not(.home-profile) {
         transform: none;
     }
 }
+
+/* 卡片已有 16:9 封面，禁用主题的竖版 hover 预览（太丑且重复） */
+.cover-preview {
+    display: none !important;
+}

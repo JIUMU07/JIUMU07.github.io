@@ -7,7 +7,7 @@ tags: ["Minecraft", "整合包", "开服", "教程", "ServerPackCreator", "Forge
 cover:
   image: "/images/covers/mc-server.jpg"
   alt: "Minecraft 整合包开服封面"
-  credit: "Photo: Unsplash"
+  credit: "Image: WallpaperAccess"
 summary: 整合包只发客户端时，用 ServerPackCreator 直接生成服务端包：它会扫描 mod 的 sideness、自动排除纯客户端 mod，并生成启动脚本。本文只讲这一种方法，从下载、GUI/CLI 生成到启动、验证和更新。
 ---
 
