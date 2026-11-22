@@ -713,3 +713,17 @@ body:not(.home-profile) {
 .cover-preview {
     display: none !important;
 }
+
+/* 首页单列居中：去掉右侧「最新文章/标签」栏，避免窄屏被裁成不对称 */
+body.home-profile {
+    --nav-width: 720px;
+}
+body.home-profile .main {
+    max-width: min(calc(var(--main-width) + var(--gap) * 2), 100vw);
+}
+.home-layout {
+    display: block;
+}
+.home-sidebar {
+    display: none !important;
+}
