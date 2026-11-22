@@ -4,6 +4,10 @@ date: 2026-11-12
 draft: false
 categories: ["技术"]
 tags: ["Hugo", "Hexo", "静态站点"]
+cover:
+  image: "/images/covers/hugo-vs-hexo.jpg"
+  alt: "Hugo 与 Hexo 对比封面"
+  credit: "Photo: Unsplash"
 summary: 把博客从 Hexo 7 迁移到 Hugo 之后的一些对比：构建方式、性能量级、主题生态、内容组织与部署成本，以及各自的适用场景。
 ---
 

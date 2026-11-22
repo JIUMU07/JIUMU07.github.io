@@ -4,6 +4,10 @@ date: 2026-11-18
 draft: false
 categories: ["技术"]
 tags: ["EasyTier", "内网穿透", "组网", "教程"]
+cover:
+  image: "/images/covers/easytier.jpg"
+  alt: "EasyTier 虚拟局域网封面"
+  credit: "Photo: Unsplash"
 summary: EasyTier 是一个去中心化的异地组网工具，用一条命令就能把公网服务器、家里电脑和手机拉进同一个虚拟局域网。本文记录我在首尔服务器上搭中继节点的过程，以及 Windows、Linux、Android 客户端的使用方法和踩过的坑。
 ---
 
