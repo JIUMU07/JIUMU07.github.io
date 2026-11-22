@@ -176,26 +176,10 @@ button.menu-toggle {
     box-shadow: var(--shadow-card);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-/* hover 左侧 2px accent 线 */
-.post-entry::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 14px;
-    bottom: 14px;
-    width: 2px;
-    border-radius: 2px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
 .post-entry:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-card-hover);
     border-color: var(--line);
-}
-.post-entry:hover::before {
-    opacity: 1;
 }
 .post-entry:active {
     transform: translateY(0) scale(0.995);
@@ -711,19 +695,5 @@ body:not(.home-profile) {
 
 /* 卡片已有 16:9 封面，禁用主题的竖版 hover 预览（太丑且重复） */
 .cover-preview {
-    display: none !important;
-}
-
-/* 首页单列居中：去掉右侧「最新文章/标签」栏，避免窄屏被裁成不对称 */
-body.home-profile {
-    --nav-width: 720px;
-}
-body.home-profile .main {
-    max-width: min(calc(var(--main-width) + var(--gap) * 2), 100vw);
-}
-.home-layout {
-    display: block;
-}
-.home-sidebar {
     display: none !important;
 }
