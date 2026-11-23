@@ -38,31 +38,6 @@
     {{ partialCached "footer.html" . .Layout .Kind (.Param "hideFooter") (print .Params.code) (.Store.Get "loadMedia") (.Store.Get "loadPan") -}}
     {{- $searchUI := site.Params.pagefind.searchUI | default "modal" -}}
     {{- if ne $searchUI "off" -}}
-    <script src="/pagefind/pagefind-component-ui.js" type="module"></script>
-    {{- /* 中文单字查询补丁：把 CJK 查询词切为单字（空格分隔），与 pf-prep.js 生成的单字索引对齐 */ -}}
-    <script type="module">
-        (function () {
-            var patch = function () {
-                if (!window.PagefindComponents || !window.PagefindComponents.getInstanceManager) return false;
-                var inst = window.PagefindComponents.getInstanceManager().getInstance('default');
-                if (!inst || inst.__cjkPatched) return true;
-                inst.__cjkPatched = true;
-                var orig = inst.triggerSearch.bind(inst);
-                inst.triggerSearch = function (term) {
-                    try {
-                        term = String(term == null ? '' : term)
-                            .replace(/([\u3400-\u9fff\uf900-\ufaff])(?=[\u3400-\u9fff\uf900-\ufaff])/g, '$1 ');
-                    } catch (e) { /* ignore */ }
-                    return orig(term);
-                };
-                return true;
-            };
-            if (!patch()) {
-                var timer = setInterval(function () { if (patch()) clearInterval(timer); }, 50);
-                setTimeout(function () { clearInterval(timer); }, 10000);
-            }
-        })();
-    </script>
     {{- if eq $searchUI "modal" -}}
     <pagefind-modal></pagefind-modal>
     {{- end -}}
@@ -74,54 +49,95 @@
             var theme = html.dataset.theme;
             var isDark = theme === 'dark' ||
                 (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            if (isDark) {
-                html.setAttribute('data-pf-theme', 'dark');
-            } else {
-                html.removeAttribute('data-pf-theme');
-            }
+            if (isDark) { html.setAttribute('data-pf-theme', 'dark'); }
+            else { html.removeAttribute('data-pf-theme'); }
         }
         syncPfTheme();
         new MutationObserver(syncPfTheme).observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme']
+            attributes: true, attributeFilter: ['data-theme']
         });
     })();
     </script>
-    {{- if eq $searchUI "modal" -}}
     <script>
-    // modal 模式：放大镜图标按钮点击打开 pagefind modal，并做 Mac 快捷键提示适配
+    // B-10: Pagefind 默认不加载；点击搜索图标 / Ctrl+K / /search/ 页才拉 JS。
+    window.__pfLoad = function () {
+        if (window.__pfPromise) return window.__pfPromise;
+        window.__pfPromise = new Promise(function (resolve, reject) {
+            var s = document.createElement('script');
+            s.type = 'module';
+            s.src = '/pagefind/pagefind-component-ui.js';
+            s.onload = function () {
+                function patch() {
+                    if (!window.PagefindComponents || !window.PagefindComponents.getInstanceManager) return false;
+                    var inst = window.PagefindComponents.getInstanceManager().getInstance('default');
+                    if (!inst || inst.__cjkPatched) return true;
+                    inst.__cjkPatched = true;
+                    var orig = inst.triggerSearch.bind(inst);
+                    inst.triggerSearch = function (term) {
+                        try {
+                            term = String(term == null ? '' : term)
+                                .replace(/([\u3400-\u9fff\uf900-\ufaff])(?=[\u3400-\u9fff\uf900-\ufaff])/g, '$1 ');
+                        } catch (e) {}
+                        return orig(term);
+                    };
+                    return true;
+                }
+                if (!patch()) {
+                    var timer = setInterval(function () { if (patch()) clearInterval(timer); }, 50);
+                    setTimeout(function () { clearInterval(timer); }, 10000);
+                }
+                resolve();
+            };
+            s.onerror = reject;
+            document.body.appendChild(s);
+        });
+        return window.__pfPromise;
+    };
+
     (function () {
-        function setupSearchIconBtn() {
-            var btn = document.getElementById('search-icon-btn');
-            if (!btn) return;
-
-            // Mac 适配：title 中 Ctrl → Cmd
-            if (navigator.platform.toUpperCase().indexOf('MAC') !== -1) {
-                var label = btn.getAttribute('title') || '';
-                btn.setAttribute('title', label.replace('Ctrl', 'Cmd'));
-            }
-
-            btn.addEventListener('click', function () {
+        function openSearch() {
+            window.__pfLoad().then(function () {
                 var trigger = document.querySelector('pagefind-modal-trigger');
                 if (!trigger) return;
                 function tryOpen() {
-                    if (typeof trigger.openModal === 'function') {
-                        trigger.openModal();
-                        return true;
-                    }
+                    if (typeof trigger.openModal === 'function') { trigger.openModal(); return true; }
                     return false;
                 }
                 if (!tryOpen() && window.customElements && customElements.whenDefined) {
                     customElements.whenDefined('pagefind-modal-trigger').then(tryOpen);
                 }
-            });
+            }).catch(function () {});
         }
+
+        function setupSearchIconBtn() {
+            var btn = document.getElementById('search-icon-btn');
+            if (!btn) return;
+            if (navigator.platform.toUpperCase().indexOf('MAC') !== -1) {
+                var label = btn.getAttribute('title') || '';
+                btn.setAttribute('title', label.replace('Ctrl', 'Cmd'));
+            }
+            btn.addEventListener('click', openSearch);
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                openSearch();
+            }
+        });
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', setupSearchIconBtn);
         } else {
             setupSearchIconBtn();
         }
+        {{- if eq .Layout "search" }}
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { window.__pfLoad(); });
+        } else {
+            window.__pfLoad();
+        }
+        {{- end }}
     })();
     </script>
     {{- end -}}
@@ -242,8 +258,8 @@
     })();
     </script>
     {{- end -}}
-    {{- end -}}
 </body>
 
 </html>
+
 
