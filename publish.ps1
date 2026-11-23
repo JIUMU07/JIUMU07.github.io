@@ -16,6 +16,16 @@ function Fail($msg) {
     exit 1
 }
 
+# 加密文章功能已禁用：主题的 single.html 会把密码明文写进 HTML，
+# 且 encrypt.js 未接入构建。发布前直接拦截，避免误发。
+$locked = Get-ChildItem (Join-Path $Root "content") -Recurse -File -Filter *.md |
+    Select-String -Pattern '^\s*(mima|password|protected)\s*:'
+if ($locked) {
+    Write-Host "encrypted articles are disabled; found:" -ForegroundColor Red
+    $locked | ForEach-Object { Write-Host ("  " + $_.Path) -ForegroundColor Red }
+    exit 1
+}
+
 $t0 = Get-Date
 
 Write-Host "[1/4] 编译..." -ForegroundColor Cyan

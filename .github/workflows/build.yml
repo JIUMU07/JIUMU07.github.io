@@ -31,6 +31,23 @@ jobs:
 
       - run: npm ci
 
+      # 加密文章功能已禁用：主题会把密码明文写进 HTML，发布前拦截
+      - name: Reject encrypted articles
+        run: |
+          python3 - <<'PY'
+          import pathlib, re, sys
+          bad = []
+          for p in pathlib.Path('content').rglob('*.md'):
+              text = p.read_text(encoding='utf-8', errors='ignore')
+              m = re.match(r'(?s)^---\s*\r?\n(.*?)\r?\n---', text)
+              if m and re.search(r'(?m)^\s*(mima|password|protected)\s*:', m.group(1)):
+                  bad.append(str(p))
+          if bad:
+              print('encrypted articles are disabled:', ', '.join(bad))
+              sys.exit(1)
+          print('no encrypted articles')
+          PY
+
       # Pagefind 索引必须基于构建产物生成；直接用 npx pagefind --site public
       # 会跳过中文预处理，导致中文关键词搜不到（pagefind issue #987）
       - name: Pagefind 索引

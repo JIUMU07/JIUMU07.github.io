@@ -70,6 +70,8 @@ hugo new content posts/文章文件名.md
 
 图片放在 `content/posts/文章文件名/` 目录里，正文用相对路径引用，主题会自动做灯箱和尺寸优化。
 
+> **加密文章功能已禁用。** 主题的 `single.html` 会把 `mima` / `password` 密码明文写进 HTML，而 `encrypt.js` 没有接入任何构建管线。现在 `publish.ps1` 和 CI 会在构建前拦截包含这些字段的文章；需要加密时请用外部静态加密方案，不要直接发布。
+
 ## 搜索
 
 搜索用 Pagefind，索引不在 `hugo server` 里生成，需要构建后单独跑一次：
