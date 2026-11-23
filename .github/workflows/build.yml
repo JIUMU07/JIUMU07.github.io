@@ -18,7 +18,7 @@ jobs:
 
       - uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "latest"
+          hugo-version: "0.169.0"
           extended: true
 
       # 用 --gc --cleanDestinationDir --minify 而不是 -D：-D 会把草稿一起发布

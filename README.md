@@ -135,6 +135,24 @@ hugo.yaml            站点配置
 
 `--cleanDestinationDir` 不能省：Hugo 默认不会删除 `public/` 里源文件已不存在的旧页面，本地发布若直接打包旧目录，会把幽灵页带上线。
 
+发布脚本还会：
+
+- 校验本地 Hugo 必须是 `v0.169.0 extended`；
+- 在服务器 `releases/<时间戳>/` 保存发布前快照，保留最近 5 份；
+- 发布后烟测首页、`index.xml`、Pagefind 组件 JS，任一非 200 即报错。
+
+### 回滚
+
+```powershell
+# 回滚到最近一次发布前的快照
+.\rollback.ps1
+
+# 回滚到指定时间戳
+.\rollback.ps1 20261123-123456
+```
+
+快照在服务器 `/opt/novelsite/blog/releases/`；回滚同样会做首页与 Pagefind 烟测。
+
 ### CI：只构建，不发布
 
 推送到 `main` 会触发 `.github/workflows/build.yml`，只做构建校验：

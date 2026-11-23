@@ -16,6 +16,11 @@ function Fail($msg) {
     exit 1
 }
 
+$hugoVersion = ((hugo version) -join " ")
+if ($hugoVersion -notmatch 'v0\.169\.0') {
+    Fail ("Hugo 版本不匹配，需要 v0.169.0 extended，当前: " + $hugoVersion)
+}
+
 # 加密文章功能已禁用：主题的 single.html 会把密码明文写进 HTML，
 # 且 encrypt.js 未接入构建。发布前直接拦截，避免误发。
 $locked = Get-ChildItem (Join-Path $Root "content") -Recurse -File -Filter *.md |
@@ -28,17 +33,17 @@ if ($locked) {
 
 $t0 = Get-Date
 
-Write-Host "[1/4] 编译..." -ForegroundColor Cyan
+Write-Host "[1/5] 编译..." -ForegroundColor Cyan
 npm run build
 if ($LASTEXITCODE -ne 0) { Fail "编译失败，未发布" }
 
-Write-Host "[2/4] 生成搜索索引..." -ForegroundColor Cyan
+Write-Host "[2/5] 生成搜索索引..." -ForegroundColor Cyan
 npm run search
 if ($LASTEXITCODE -ne 0) { Fail "搜索索引生成失败，未发布" }
 
 $tar = Join-Path $env:TEMP ("blog-public-{0}.tar.gz" -f $PID)
 try {
-    Write-Host "[3/4] 打包并上传..." -ForegroundColor Cyan
+    Write-Host "[3/5] 打包并上传..." -ForegroundColor Cyan
     tar -czf $tar -C (Join-Path $Root "public") .
     if ($LASTEXITCODE -ne 0) { Fail "打包失败，未发布" }
     $mb = [math]::Round((Get-Item $tar).Length / 1MB, 2)
@@ -48,19 +53,41 @@ try {
     scp -q -4 -o ConnectTimeout=15 $tar "seoul:/tmp/blog-public.tar.gz"
     if ($LASTEXITCODE -ne 0) { Fail "上传失败，未发布" }
 
-    Write-Host "[4/4] 服务器解包 + 原子替换..." -ForegroundColor Cyan
+    Write-Host "[4/5] 服务器解包 + 原子替换..." -ForegroundColor Cyan
     $remote = @"
 set -e
-rm -rf /opt/novelsite/blog/_stage
-mkdir -p /opt/novelsite/blog/_stage
-tar -xzf /tmp/blog-public.tar.gz -C /opt/novelsite/blog/_stage
-rsync -a --delete /opt/novelsite/blog/_stage/ /opt/novelsite/blog/public/
-rm -rf /opt/novelsite/blog/_stage /tmp/blog-public.tar.gz
+cd /opt/novelsite/blog
+STAMP=`$(date +%Y%m%d-%H%M%S)
+mkdir -p releases
+if [ -d public ]; then cp -a public "releases/`$STAMP"; fi
+ls -1dt releases/* | tail -n +6 | xargs -r rm -rf
+rm -rf _stage
+mkdir -p _stage
+tar -xzf /tmp/blog-public.tar.gz -C _stage
+rsync -a --delete _stage/ public/
+rm -rf _stage /tmp/blog-public.tar.gz
+echo "release=`$STAMP"
 "@
     # PowerShell 的 here-string 是 CRLF，直接喂给 bash 会把 \r 当成命令的一部分
     $remote = $remote -replace "`r", ""
     $remote | ssh -4 -o ConnectTimeout=15 seoul "bash -s"
     if ($LASTEXITCODE -ne 0) { Fail "服务器解包/替换失败，请检查 /opt/novelsite/blog" }
+
+    Write-Host "[5/5] 烟测..." -ForegroundColor Cyan
+    $checks = @(
+        "https://huangth.xyz/",
+        "https://huangth.xyz/index.xml",
+        "https://huangth.xyz/pagefind/pagefind-component-ui.js"
+    )
+    foreach ($u in $checks) {
+        try {
+            $r = Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 15
+            if ($r.StatusCode -ne 200) { Fail ("烟测失败: " + $u + " -> " + $r.StatusCode) }
+            Write-Host ("      OK " + $u) -ForegroundColor Green
+        } catch {
+            Fail ("烟测失败: " + $u + " -> " + $_.Exception.Message)
+        }
+    }
 }
 finally {
     if (Test-Path $tar) { Remove-Item $tar -Force -ErrorAction SilentlyContinue }
