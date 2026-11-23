@@ -116,18 +116,34 @@ hugo.yaml            站点配置
 站点根目录：`/opt/novelsite/blog/public/`
 仓库：`JIUMU07/JIUMU07.github.io`（保留作版本管理与 CI 触发源）
 
-### 自动部署
+### 发布
 
-推送到 `main` 即自动构建并同步到服务器，流程在 `.github/workflows/deploy.yml`：
+生产发布只有一个入口：本地 `publish.ps1`。
+
+```powershell
+.\publish.ps1
+```
+
+流程：
+
+1. `npm run build`（`hugo --gc --minify --cleanDestinationDir`，先清理 `public/`，避免已删除文章的幽灵页）
+2. `npm run search`（Pagefind 索引）
+3. 打包为 tar.gz，scp 到首尔
+4. 服务器解包到 `_stage`，`rsync -a --delete` 原子替换 `/opt/novelsite/blog/public/`
+
+`--cleanDestinationDir` 不能省：Hugo 默认不会删除 `public/` 里源文件已不存在的旧页面，本地发布若直接打包旧目录，会把幽灵页带上线。
+
+### CI：只构建，不发布
+
+推送到 `main` 会触发 `.github/workflows/build.yml`，只做构建校验：
 
 1. checkout（含主题 submodule）→ 装 Hugo extended → 装 Node 22
-2. `hugo --gc --minify` 生成 `public/`（不加 `-D`，避免草稿发布到生产）
-3. `npm ci` + `npm run search` 生成 Pagefind 索引到 `public/pagefind/`
-4. `rsync -avz --delete` 同步到 `/opt/novelsite/blog/public/`
+2. `hugo --gc --cleanDestinationDir --minify`
+3. `npm ci` + `npm run search` 生成 Pagefind 索引
 
-其中第 3 步不能省：`hugo` 只生成 HTML，搜索索引要 Pagefind 基于产物再扫一遍。缺了它浏览器会去请求 `/pagefind/pagefind-component-ui.js` 拿到 404，站内搜索直接失效。命令用 `npm run search` 而不是裸的 `npx pagefind --site public`，因为前者会先跑 `themes/jijian/scripts/pf-prep.cjs` 做中文分词预处理（pagefind issue #987）。
+CI **不再 rsync 到服务器**，因此不需要 `SERVER_HOST` / `SSH_KEY` 这两个 Actions Secret，也不会和本地发布互相覆盖。生产发布以 `publish.ps1` 为准。
 
-需要两个 Actions Secret：`SERVER_HOST`（服务器 IP）、`SSH_KEY`（部署用私钥全文）。
+其中 Pagefind 步骤不能省：`hugo` 只生成 HTML，搜索索引要 Pagefind 基于产物再扫一遍。缺了它浏览器会去请求 `/pagefind/pagefind-component-ui.js` 拿到 404，站内搜索直接失效。命令用 `npm run search` 而不是裸的 `npx pagefind --site public`，因为前者会先跑 `themes/jijian/scripts/pf-prep.cjs` 做中文分词预处理（pagefind issue #987）。
 
 > 注意：GitHub Pages 的工作流已被替换，`jiumu07.github.io` 不再更新，停留在迁移前那一版。
 

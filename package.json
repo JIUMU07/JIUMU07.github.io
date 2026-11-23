@@ -5,7 +5,7 @@
   "description": "就暮的个人博客（Hugo + 极简 jijian 主题）",
   "scripts": {
     "dev": "hugo server -D --disableFastRender",
-    "build": "hugo --gc --minify",
+    "build": "hugo --gc --minify --cleanDestinationDir",
     "search": "node themes/jijian/scripts/pf-prep.cjs && npx pagefind --site _temp/pf-site --output-path public/pagefind",
     "preview": "npm run build && npm run search && npx -y serve public"
   },

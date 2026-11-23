@@ -1,12 +1,15 @@
-name: deploy
+name: build
 
 on:
   push:
     branches: [main]
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,8 +21,8 @@ jobs:
           hugo-version: "latest"
           extended: true
 
-      # 用 --gc --minify 而不是 -D：-D 会把草稿一起发布到生产站点
-      - run: hugo --gc --minify
+      # 用 --gc --cleanDestinationDir --minify 而不是 -D：-D 会把草稿一起发布
+      - run: hugo --gc --cleanDestinationDir --minify
 
       - uses: actions/setup-node@v4
         with:
@@ -32,13 +35,3 @@ jobs:
       # 会跳过中文预处理，导致中文关键词搜不到（pagefind issue #987）
       - name: Pagefind 索引
         run: npm run search
-
-      - name: 同步到服务器
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: public/
-          remote_path: /opt/novelsite/blog/public/
-          remote_host: ${{ secrets.SERVER_HOST }}
-          remote_user: root
-          remote_key: ${{ secrets.SSH_KEY }}
