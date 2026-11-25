@@ -7,9 +7,8 @@ categories: ["教程", "联机"]
 tags: ["EasyTier", "虚拟局域网", "联机", "Minecraft", "内网穿透"]
 ShowToc: true
 cover:
-  image: "/images/covers/easytier.jpg"
+  image: "/images/covers/easytier-join-me.jpg"
   alt: "EasyTier 联机封面"
-  credit: "Photo: Unsplash"
 summary: 给朋友看的 EasyTier 接入指南：装客户端、加入我的网络、确认虚拟 IP，然后像局域网一样连进我的游戏。网络密钥不公开，只私发。
 ---
 
@@ -30,7 +29,7 @@ summary: 给朋友看的 EasyTier 接入指南：装客户端、加入我的网�
 | 我的虚拟 IP | 固定为 `10.126.126.50`；朋友连接后以 `easytier-cli peer` 里 `hth` 的实际 IP 为准 |
 | 游戏端口 | Minecraft 默认 `25565`；其他游戏以我发的端口为准 |
 
-> 网络名 + 密钥就是入网凭证。密钥不要发到群里、GitHub 或公开文章里；泄露了告诉我，我换密钥。
+> 网络名 + 密钥就是入网凭证。密钥不要发到群里、GitHub 或公开文章里。
 
 ## 先分清两个“服务器”
 
@@ -155,16 +154,6 @@ ping 10.126.126.50
 > 如果 `peer` 里 `hth` 显示的 IP 不是 `10.126.126.50`，以你实际看到的为准；EasyTier 的虚拟 IP 可能因网络配置变化。
 
 ## 六、连不上怎么排查
-
-### 0. 服务端日志提示 `network identity not match`
-
-这不是端口问题，是**网络密码不一致**。到服务器确认当前密钥：
-
-```bash
-sudo grep '密钥' /opt/easytier/creds.txt
-```
-
-把 GUI 里的网络密码删掉重新粘贴，注意大小写和末尾空格。
 
 ### 1. `peer` 里只有自己
 
