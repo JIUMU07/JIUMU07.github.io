@@ -712,3 +712,8 @@ body:not(.home-profile) {
     outline-offset: -3px;
     border-radius: var(--radius);
 }
+
+/* 隐藏第三方阅读扩展注入的白色返回顶部按钮（站点已有 #top-link） */
+#bpTop {
+    display: none !important;
+}
